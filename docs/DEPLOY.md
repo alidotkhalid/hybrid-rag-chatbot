@@ -97,104 +97,139 @@ clearest possible demonstration that you know what your own system is doing.
 
 ---
 
-## 4. Create the Space
+## 4. Choose a host
 
-1. Go to [huggingface.co/new-space](https://huggingface.co/new-space) (sign up
-   first if needed — free).
-2. **Space name:** something like `hybrid-rag-papers`.
-3. **License:** MIT.
-4. **SDK:** **Docker** → **Blank**.
-5. **Hardware:** CPU basic (free).
-6. **Visibility:** Public — the point is that people can open it.
-7. Create.
+**On Hugging Face Spaces:** as of late 2026, Docker and Gradio Spaces on the
+free CPU-basic tier require a **PRO subscription** ($9/month). Only Static
+Spaces — pure client-side HTML with no server — remain free, and this app needs
+a Python process. Hugging Face's pricing page still advertises CPU Basic as
+free; the Space creation form is the accurate source. If you have PRO, the
+Spaces route still works and the YAML header in `README.md` is already correct
+for it.
+
+These instructions use **Google Cloud Run**, whose free tier genuinely covers
+demo traffic: 2 million requests, 180,000 vCPU-seconds and 360,000 GiB-seconds
+per month, with scale-to-zero so an idle demo costs nothing.
+
+**Be honest with yourself about the caveats:**
+
+- Google requires a billing account (a card on file) before Cloud Run can be
+  enabled, even though the free tier costs nothing. Set a budget alert.
+- Container images live in Artifact Registry, which gives 0.5 GB free. This
+  image is roughly 1 GB, so expect **a few cents a month** in storage unless
+  you delete old revisions. It is not literally zero.
+- Cold starts take 20–40 s while the models load. Scale-to-zero is what keeps
+  it free; that latency is the price.
 
 ---
 
-## 5. Add your API key as a secret
+## 5. Install the Google Cloud CLI
 
-In the Space: **Settings → Variables and secrets → New secret**.
-
-- Name: `RAG_LLM_API_KEY`
-- Value: your Groq key
-
-Use **secret**, not variable — variables are visible to anyone who can see the
-Space.
-
----
-
-## 6. The Space header — already done
-
-Spaces needs a YAML block at the very top of `README.md` telling it which SDK
-to use and which port to expose. **This is already in your `README.md`** — you
-do not need to add it. For reference, it is:
-
-```yaml
----
-title: Hybrid RAG — Ask The Papers
-emoji: 📚
-colorFrom: red
-colorTo: gray
-sdk: docker
-app_port: 7860
-pinned: false
-license: mit
----
-```
-
-Leave `sdk: docker` and `app_port: 7860` alone — they must match the Dockerfile.
-The title and emoji are yours to change.
-
-## 7. Push
+Download from [cloud.google.com/sdk/docs/install](https://cloud.google.com/sdk/docs/install),
+run the installer, then **close and reopen PowerShell**.
 
 ```powershell
-git init
-git add -A
-git commit -m "Hybrid RAG chatbot"
-
-git remote add space https://huggingface.co/spaces/<your-username>/<your-space>
-git push space main
+gcloud --version
+gcloud auth login
 ```
 
-When prompted for a password, use an **access token**, not your account
-password: [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
-→ New token → type **Write** → copy → paste at the prompt.
+## 6. Create a project and enable billing
 
-> **On the index size.** The committed index is a few MB, which is fine for
-> normal git. If you later index a much larger corpus and a push is rejected
-> for file size, that is when to set up git-lfs — not before.
-
----
-
-## 8. Watch the build
-
-The Space shows a build log. First build takes ~10 minutes: it installs
-CPU-only torch and bakes the two models into the image so cold starts do not
-stall on a download.
-
-When it finishes, check `https://<your-space>.hf.space/api/health`. You want:
-
-```json
-{"status": "ok", "index_ready": true, "stats": {"chunks": 1487, ...}}
+```powershell
+gcloud projects create rag-chatbot-demo --name="RAG Chatbot"
+gcloud config set project rag-chatbot-demo
 ```
 
-If `status` is `degraded`, the message in `stats.error` says why. The usual
-cause is that `data/index/` was not committed — check with
-`git ls-files data/index`.
+Then in the console, link a billing account to the project
+([console.cloud.google.com/billing](https://console.cloud.google.com/billing))
+and set a budget alert at $1 so any charge is immediately visible.
 
----
+Enable the APIs the deploy needs:
 
-## 9. Put it on your CV
+```powershell
+gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com
+```
 
-Once it is live:
+## 7. Deploy
 
-- Add the Space URL to the top of `README.md` where the placeholder is.
-- Run the evaluation and **fill in the ablation table** in `README.md` with
-  your real numbers. An empty table is worse than no table; a filled one is the
-  thing that makes the project credible.
-- Push the repo to GitHub too — recruiters look at commit history and READMEs,
-  and Spaces' git view is not where they will look.
+From the project root:
 
----
+```powershell
+gcloud run deploy hybrid-rag-papers `
+  --source . `
+  --region asia-south1 `
+  --allow-unauthenticated `
+  --memory 2Gi `
+  --cpu 2 `
+  --cpu-boost `
+  --timeout 300 `
+  --concurrency 8 `
+  --min-instances 0 `
+  --max-instances 2
+```
+
+What each flag is doing, since these are the ones that matter:
+
+| flag | why |
+|---|---|
+| `--source .` | builds from the Dockerfile with Cloud Build; no local Docker needed |
+| `--memory 2Gi` | torch plus both models sit around 1 GB resident; 512 Mi will OOM |
+| `--cpu 2` | reranking is CPU-bound — 30 cross-encoder passes per query |
+| `--cpu-boost` | extra CPU during startup, which cuts cold-start model loading |
+| `--timeout 300` | answers stream over SSE; the default 60 s can cut long ones off |
+| `--concurrency 8` | one process, one model copy — do not let it be swamped |
+| `--min-instances 0` | scale to zero when idle. This is what keeps it free. |
+| `--max-instances 2` | a hard ceiling, so a traffic spike cannot run up a bill |
+
+The first build takes ~10 minutes. It prints a service URL when done.
+
+## 8. Add your API key
+
+Set it as an environment variable on the deployed service, so it is never in
+your shell history or the image:
+
+```powershell
+gcloud run services update hybrid-rag-papers `
+  --region asia-south1 `
+  --update-env-vars RAG_LLM_API_KEY=your_groq_key_here
+```
+
+Or through the console: **Cloud Run → hybrid-rag-papers → Edit & deploy new
+revision → Variables & Secrets**.
+
+For a longer-lived deployment, Secret Manager is the better home for this
+(`--update-secrets`), and its free tier covers a single secret comfortably.
+
+## 9. Verify
+
+```powershell
+gcloud run services describe hybrid-rag-papers --region asia-south1 --format="value(status.url)"
+```
+
+Visit `<that URL>/api/health` and confirm `"index_ready": true`. The URL without
+the path is your live demo.
+
+## 10. Redeploying after a change
+
+```powershell
+git add -A ; git commit -m "..." ; git push origin main
+gcloud run deploy hybrid-rag-papers --source . --region asia-south1
+```
+
+The service keeps its URL and its environment variables across deploys.
+
+## 11. Keeping the cost at zero
+
+```powershell
+# what has actually been billed
+gcloud billing accounts list
+
+# delete old container images (the one real cost)
+gcloud artifacts docker images list asia-south1-docker.pkg.dev/rag-chatbot-demo/cloud-run-source-deploy
+```
+
+Delete superseded images after a few redeploys and storage stays inside the
+free allowance.
 
 ## Troubleshooting
 

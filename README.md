@@ -241,28 +241,30 @@ what milliseconds, and that experiment has not been run yet.
 
 ## Deploying
 
-Hugging Face Spaces, Docker SDK. It is the only free tier with enough RAM
-(16GB) to hold a local embedding model and a cross-encoder — Render's free tier
-is 512MB, where torch alone does not fit.
+**Google Cloud Run.** The Dockerfile builds a CPU-only image with both models
+baked in, so cold starts do not stall on a 150 MB download:
 
-1. Create a Space at [huggingface.co/new-space](https://huggingface.co/new-space)
-   → SDK **Docker**, blank template.
-2. Add `RAG_LLM_API_KEY` under *Settings → Variables and secrets* as a
-   **secret** (not a variable).
-3. Push:
+```bash
+gcloud run deploy hybrid-rag-papers --source . --region asia-south1 \
+  --allow-unauthenticated --memory 2Gi --cpu 2 --cpu-boost \
+  --timeout 300 --concurrency 8 --min-instances 0 --max-instances 2
+```
 
-   ```bash
-   git remote add space https://huggingface.co/spaces/<user>/<space>
-   git push space main
-   ```
+`--memory 2Gi` is not padding: torch plus the bi-encoder and cross-encoder sit
+around 1 GB resident, and 512 MB hosts will OOM. `--min-instances 0` scales to
+zero when idle, which is what keeps the running cost at nothing in exchange for
+a 20–40 s cold start.
 
-The build bakes the model weights into the image, so cold starts do not stall
-on a 150MB download. First build takes ~10 minutes; subsequent ones are cached.
+**A note on Hugging Face Spaces**, since the README carries a Spaces YAML
+header: as of late 2026 Docker and Gradio Spaces require a **PRO subscription**;
+only Static Spaces remain free, and this app needs a Python process. Their
+pricing page still lists CPU Basic as free — the Space creation form is the
+accurate source. The YAML header is left in place so the Spaces route works
+immediately for anyone who has PRO.
 
-Full step-by-step instructions, including the Windows-specific parts, are in
+Full step-by-step instructions, including the Windows-specific parts and how to
+keep image storage inside the free allowance, are in
 [`docs/DEPLOY.md`](docs/DEPLOY.md).
-
----
 
 ## Layout
 

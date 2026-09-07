@@ -60,12 +60,18 @@ SentenceTransformer('BAAI/bge-small-en-v1.5'); \
 CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2', max_length=512); \
 print('models cached')"
 
+# 7860 is the Hugging Face Spaces convention and the local default.
+# Cloud Run injects its own $PORT and ignores EXPOSE entirely.
 EXPOSE 7860
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=3 \
-    CMD python -c "import httpx,sys; sys.exit(0 if httpx.get('http://localhost:7860/api/health',timeout=4).json()['index_ready'] else 1)"
+    CMD python -c "import httpx,os,sys; p=os.environ.get('PORT','7860'); sys.exit(0 if httpx.get(f'http://localhost:{p}/api/health',timeout=4).json()['index_ready'] else 1)"
 
 # One worker on purpose: each worker loads its own copy of the embedding and
 # reranker models (~600MB resident), and the free tier has neither the RAM nor
 # the CPU for two. Concurrency comes from the thread pool inside the process.
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "7860", "--workers", "1", "--timeout-keep-alive", "75"]
+# Shell form so ${PORT} is expanded at runtime. Cloud Run assigns the port and
+# the container MUST listen on it; a hardcoded port fails the startup probe with
+# a misleading "container failed to start" error. `exec` keeps uvicorn as PID 1
+# so it receives SIGTERM directly and shuts down cleanly on scale-to-zero.
+CMD ["sh", "-c", "exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-7860} --workers 1 --timeout-keep-alive 75"]
