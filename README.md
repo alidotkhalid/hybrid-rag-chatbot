@@ -6,9 +6,11 @@ Reciprocal Rank Fusion, cross-encoder reranking, a groundedness gate that
 declines rather than guesses, and citations validated server-side against what
 was actually retrieved.
 
-<!-- Replace this line with your demo recording. Drag an .mp4 into the GitHub
-     README editor to upload it, or commit docs/demo.gif and use:
-     ![demo](docs/demo.gif) -->
+
+
+https://github.com/user-attachments/assets/b9313ac3-9b63-4e1e-a28d-a23c6ebca56d
+
+
 
 **Run it yourself in three commands, about five minutes:**
 
