@@ -152,12 +152,20 @@ gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregi
 
 ## 7. Deploy
 
+**On the region.** These commands use `us-central1` rather than a region closer
+to you. Cloud Run's Always Free tier includes 1 GiB of outbound transfer per
+month *from North America only*; egress from other regions is billed from the
+first byte. The amounts here are trivial either way — an answer is a few KB —
+but `us-central1` keeps the deployment cleanly inside the documented free tier.
+The added latency is ~200 ms, which is noise next to the ~2.5 s the
+cross-encoder already takes.
+
 From the project root:
 
 ```powershell
 gcloud run deploy hybrid-rag-papers `
   --source . `
-  --region asia-south1 `
+  --region us-central1 `
   --allow-unauthenticated `
   --memory 2Gi `
   --cpu 2 `
@@ -190,7 +198,7 @@ your shell history or the image:
 
 ```powershell
 gcloud run services update hybrid-rag-papers `
-  --region asia-south1 `
+  --region us-central1 `
   --update-env-vars RAG_LLM_API_KEY=your_groq_key_here
 ```
 
@@ -203,7 +211,7 @@ For a longer-lived deployment, Secret Manager is the better home for this
 ## 9. Verify
 
 ```powershell
-gcloud run services describe hybrid-rag-papers --region asia-south1 --format="value(status.url)"
+gcloud run services describe hybrid-rag-papers --region us-central1 --format="value(status.url)"
 ```
 
 Visit `<that URL>/api/health` and confirm `"index_ready": true`. The URL without
@@ -213,7 +221,7 @@ the path is your live demo.
 
 ```powershell
 git add -A ; git commit -m "..." ; git push origin main
-gcloud run deploy hybrid-rag-papers --source . --region asia-south1
+gcloud run deploy hybrid-rag-papers --source . --region us-central1
 ```
 
 The service keeps its URL and its environment variables across deploys.
@@ -225,7 +233,7 @@ The service keeps its URL and its environment variables across deploys.
 gcloud billing accounts list
 
 # delete old container images (the one real cost)
-gcloud artifacts docker images list asia-south1-docker.pkg.dev/rag-chatbot-demo/cloud-run-source-deploy
+gcloud artifacts docker images list us-central1-docker.pkg.dev/rag-chatbot-demo/cloud-run-source-deploy
 ```
 
 Delete superseded images after a few redeploys and storage stays inside the
