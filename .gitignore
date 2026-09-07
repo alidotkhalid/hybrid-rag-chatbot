@@ -1,0 +1,32 @@
+# Secrets
+.env
+
+# The corpus is downloaded, not committed: the PDFs are the authors' work and
+# ~60MB of binaries do not belong in git. `python -m ragcore.ingest fetch`
+# reproduces it exactly.
+data/corpus/
+
+# The built index IS committed (data/index/) — it is small, it makes a
+# deployment reproducible without re-downloading anything, and it is the
+# artefact the service actually needs.
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Eval output
+evaluation/results*.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Delivery archive (safe to delete)
+*.tar.gz

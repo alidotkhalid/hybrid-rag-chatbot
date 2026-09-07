@@ -1,0 +1,8 @@
+# Normalise line endings so the repo is byte-identical across Windows,
+# macOS and the Linux container that builds the Docker image.
+* text=auto eol=lf
+
+# Binary index artefacts must never be line-ending mangled.
+*.npy binary
+*.npz binary
+*.pdf binary

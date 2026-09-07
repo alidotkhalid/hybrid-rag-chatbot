@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ask the Papers · hybrid retrieval console</title>
+<meta name="description" content="A retrieval console over foundational ML papers. Hybrid BM25 + dense retrieval, reciprocal rank fusion, cross-encoder reranking, validated citations.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230b0f14'/><circle cx='16' cy='16' r='9' fill='none' stroke='%2352d0e0' stroke-width='2'/><path d='M16 2v6M16 24v6M2 16h6M24 16h6' stroke='%2352d0e0' stroke-width='2'/></svg>">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────────── -->
+  <aside class="sidebar" id="sidebar">
+    <header class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="16" cy="16" r="9"/><path d="M16 3v5M16 24v5M3 16h5M24 16h5"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>Ask the Papers</h1>
+        <p class="brand-sub">Hybrid retrieval console</p>
+      </div>
+    </header>
+
+    <section class="panel">
+      <h2>Pipeline</h2>
+      <ol class="pipeline">
+        <li><span class="step-n">01</span><div><b>Condense</b><em>resolve follow-ups</em></div></li>
+        <li><span class="step-n">02</span><div><b>BM25 &times; dense</b><em>30 candidates each</em></div></li>
+        <li><span class="step-n">03</span><div><b>RRF fusion</b><em>k = 60</em></div></li>
+        <li><span class="step-n">04</span><div><b>Cross-encoder</b><em>rerank &rarr; 6</em></div></li>
+        <li><span class="step-n">05</span><div><b>Grounded answer</b><em>validated citations</em></div></li>
+      </ol>
+    </section>
+
+    <section class="panel">
+      <h2>Your documents</h2>
+      <p class="hint">Indexed in memory for this session only, then discarded.</p>
+      <label class="upload" id="upload-label">
+        <input type="file" id="file-input" accept=".pdf,.txt,.md,.markdown,.docx" hidden>
+        <span id="upload-text">Upload PDF · MD · TXT · DOCX</span>
+      </label>
+      <ul class="uploaded" id="uploaded-list"></ul>
+    </section>
+
+    <section class="panel panel-corpus">
+      <h2>Corpus <span class="count" id="doc-count"></span></h2>
+      <ul class="corpus" id="corpus-list"></ul>
+    </section>
+
+    <footer class="sidebar-foot">
+      <div class="stat-row" id="index-stats"></div>
+      <a class="ghost-link" href="/docs">API reference &rarr;</a>
+    </footer>
+  </aside>
+
+  <!-- ── Chat ────────────────────────────────────────────────────── -->
+  <main class="chat">
+    <div class="chat-head">
+      <button class="icon-btn only-narrow" id="menu-btn" aria-label="Toggle sidebar">&#9776;</button>
+      <div class="status" id="status"><span class="dot"></span><span id="status-text">connecting</span></div>
+      <label class="toggle">
+        <input type="checkbox" id="debug-toggle">
+        <span class="wide-only">Retrieval trace</span>
+        <span class="narrow-only">Trace</span>
+      </label>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="welcome">
+        <p class="eyebrow" id="eyebrow">exact search over the ML literature</p>
+        <h2>Ask a question about the literature.</h2>
+        <p class="welcome-body">Answers are generated only from retrieved passages, every citation is checked against what was actually retrieved, and questions the corpus cannot support are declined rather than guessed.</p>
+        <div class="suggestions" id="suggestions">
+          <button>Why does RAG use a dense retriever instead of BM25?</button>
+          <button>What is the compute-optimal ratio of tokens to parameters?</button>
+          <button>How does LoRA reduce the number of trainable parameters?</button>
+          <button>What are reflection tokens in Self-RAG?</button>
+          <button>Compare chain-of-thought prompting with ReAct.</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="composer">
+      <div class="composer-inner">
+        <textarea id="input" rows="1" placeholder="Query the corpus…" autocomplete="off"></textarea>
+        <button id="send" aria-label="Send">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+      <p class="composer-note">Grounded in retrieved passages · declines what the corpus does not cover</p>
+    </div>
+  </main>
+
+  <!-- ── Sources drawer ──────────────────────────────────────────── -->
+  <aside class="sources" id="sources-panel">
+    <div class="sources-head">
+      <h2>Sources</h2>
+      <button class="icon-btn" id="close-sources" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="sources-body" id="sources-body">
+      <p class="empty">Retrieved passages appear here.</p>
+    </div>
+  </aside>
+
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

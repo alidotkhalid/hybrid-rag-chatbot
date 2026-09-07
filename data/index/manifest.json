@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "embedding_model": "BAAI/bge-small-en-v1.5",
+  "stats": {
+    "chunks": 2665,
+    "documents": 24,
+    "vector_backend": "faiss-IndexFlatIP",
+    "vector_dimension": 384,
+    "embedding_model": "BAAI/bge-small-en-v1.5",
+    "bm25_vocabulary": 25518,
+    "mean_chunk_tokens": 285.0
+  }
+}

@@ -1,0 +1,40 @@
+{"id": "q01", "question": "How many attention heads does the base Transformer use?", "gold_sources": ["1706.03762.pdf"], "answer_keywords": ["8", "eight", "heads"], "type": "lexical", "note": "Exact numeric fact."}
+{"id": "q02", "question": "Why did the authors replace recurrence with attention?", "gold_sources": ["1706.03762.pdf"], "answer_keywords": ["parallel", "sequential", "path length"], "type": "semantic", "note": "Paraphrase; no shared rare vocabulary with the source."}
+{"id": "q03", "question": "What is scaled dot-product attention and why is it scaled?", "gold_sources": ["1706.03762.pdf"], "answer_keywords": ["dot product", "softmax", "gradient"], "type": "semantic"}
+{"id": "q04", "question": "What positional encoding scheme does the original Transformer use?", "gold_sources": ["1706.03762.pdf"], "answer_keywords": ["sinusoid", "position"], "type": "semantic"}
+{"id": "q05", "question": "What are the two pre-training objectives used by BERT?", "gold_sources": ["1810.04805.pdf"], "answer_keywords": ["masked", "next sentence"], "type": "semantic"}
+{"id": "q06", "question": "What does the [CLS] token do in BERT?", "gold_sources": ["1810.04805.pdf"], "answer_keywords": ["classification", "aggregate", "representation"], "type": "lexical", "note": "Bracketed literal token; dense retrievers routinely lose this."}
+{"id": "q07", "question": "How does T5 frame every NLP task?", "gold_sources": ["1910.10683.pdf"], "answer_keywords": ["text-to-text", "unified"], "type": "semantic"}
+{"id": "q08", "question": "What is RoPE and how does it encode position?", "gold_sources": ["2104.09864.pdf"], "answer_keywords": ["rotary", "rotation", "relative"], "type": "lexical"}
+{"id": "q09", "question": "How does FlashAttention reduce memory usage without approximating attention?", "gold_sources": ["2205.14135.pdf"], "answer_keywords": ["tiling", "IO", "HBM", "SRAM"], "type": "semantic"}
+{"id": "q10", "question": "What relationship do the scaling laws predict between loss and model size?", "gold_sources": ["2001.08361.pdf"], "answer_keywords": ["power law", "loss", "parameters"], "type": "semantic"}
+{"id": "q11", "question": "How many parameters does GPT-3 have?", "gold_sources": ["2005.14165.pdf"], "answer_keywords": ["175 billion", "175B"], "type": "lexical"}
+{"id": "q12", "question": "What is the compute-optimal ratio of training tokens to parameters?", "gold_sources": ["2203.15556.pdf"], "answer_keywords": ["equally", "double", "20"], "type": "semantic"}
+{"id": "q13", "question": "How large is Chinchilla and how many tokens was it trained on?", "gold_sources": ["2203.15556.pdf"], "answer_keywords": ["70", "1.4 trillion"], "type": "lexical"}
+{"id": "q14", "question": "What data did LLaMA train on, and why does that matter?", "gold_sources": ["2302.13971.pdf"], "answer_keywords": ["publicly available", "open"], "type": "semantic"}
+{"id": "q15", "question": "What safety techniques were used in Llama 2's chat models?", "gold_sources": ["2307.09288.pdf"], "answer_keywords": ["RLHF", "red team", "safety"], "type": "semantic"}
+{"id": "q16", "question": "What are the three steps of the InstructGPT training procedure?", "gold_sources": ["2203.02155.pdf"], "answer_keywords": ["supervised", "reward model", "PPO", "reinforcement"], "type": "semantic"}
+{"id": "q17", "question": "By how much does LoRA reduce the number of trainable parameters?", "gold_sources": ["2106.09685.pdf"], "answer_keywords": ["10000", "10,000"], "type": "lexical"}
+{"id": "q18", "question": "Where in the network does LoRA inject its low-rank matrices?", "gold_sources": ["2106.09685.pdf"], "answer_keywords": ["attention", "weight", "layer", "frozen"], "type": "semantic"}
+{"id": "q19", "question": "How does DPO avoid training a separate reward model?", "gold_sources": ["2305.18290.pdf"], "answer_keywords": ["closed form", "implicit", "classification", "preference"], "type": "semantic"}
+{"id": "q20", "question": "What is chain-of-thought prompting?", "gold_sources": ["2201.11903.pdf"], "answer_keywords": ["intermediate", "reasoning", "steps"], "type": "semantic"}
+{"id": "q21", "question": "How does ReAct combine reasoning with acting?", "gold_sources": ["2210.03629.pdf"], "answer_keywords": ["thought", "action", "observation", "interleav"], "type": "semantic"}
+{"id": "q22", "question": "What architecture does Dense Passage Retrieval use for its encoders?", "gold_sources": ["2004.04906.pdf"], "answer_keywords": ["bi-encoder", "dual", "BERT"], "type": "semantic"}
+{"id": "q23", "question": "How is DPR trained, and what are in-batch negatives?", "gold_sources": ["2004.04906.pdf"], "answer_keywords": ["in-batch", "negative", "contrastive"], "type": "lexical"}
+{"id": "q24", "question": "What are the parametric and non-parametric memories in RAG?", "gold_sources": ["2005.11401.pdf"], "answer_keywords": ["parametric", "non-parametric", "Wikipedia", "BART"], "type": "semantic"}
+{"id": "q25", "question": "What is the difference between RAG-Sequence and RAG-Token?", "gold_sources": ["2005.11401.pdf"], "answer_keywords": ["sequence", "token", "document"], "type": "lexical"}
+{"id": "q26", "question": "How does Fusion-in-Decoder process multiple retrieved passages?", "gold_sources": ["2007.01282.pdf"], "answer_keywords": ["encode", "independently", "decoder", "concatenat"], "type": "semantic"}
+{"id": "q27", "question": "How is Contriever trained without relevance labels?", "gold_sources": ["2112.09118.pdf"], "answer_keywords": ["contrastive", "unsupervised", "inverse cloze", "augmentation"], "type": "semantic"}
+{"id": "q28", "question": "What does HyDE generate before retrieving?", "gold_sources": ["2212.10496.pdf"], "answer_keywords": ["hypothetical", "document", "embed"], "type": "semantic"}
+{"id": "q29", "question": "What are reflection tokens in Self-RAG?", "gold_sources": ["2310.11511.pdf"], "answer_keywords": ["reflection", "critique", "retrieve", "token"], "type": "lexical"}
+{"id": "q30", "question": "How does RAPTOR organise its retrieval index?", "gold_sources": ["2401.18059.pdf"], "answer_keywords": ["tree", "cluster", "summar", "recursive"], "type": "semantic"}
+{"id": "q31", "question": "What problem does GraphRAG solve that standard RAG cannot?", "gold_sources": ["2404.16130.pdf"], "answer_keywords": ["global", "corpus", "summar", "community"], "type": "semantic"}
+{"id": "q32", "question": "What are the naive, advanced and modular RAG paradigms?", "gold_sources": ["2312.10997.pdf"], "answer_keywords": ["naive", "advanced", "modular"], "type": "lexical"}
+{"id": "q33", "question": "How do BERT and GPT-3 differ in how they are adapted to downstream tasks?", "gold_sources": ["1810.04805.pdf", "2005.14165.pdf"], "answer_keywords": ["fine-tun", "few-shot", "in-context"], "type": "multi-source", "note": "Answer requires both papers; tests the diversification cap."}
+{"id": "q34", "question": "Compare how LoRA and full fine-tuning differ in memory cost.", "gold_sources": ["2106.09685.pdf"], "answer_keywords": ["memory", "GPU", "frozen", "3"], "type": "semantic"}
+{"id": "q35", "question": "How do dense retrieval and BM25 differ in what they can match?", "gold_sources": ["2004.04906.pdf", "2312.10997.pdf"], "answer_keywords": ["lexical", "semantic", "term", "overlap"], "type": "multi-source"}
+{"id": "u01", "question": "What was Anthropic's revenue in 2024?", "gold_sources": [], "answer_keywords": [], "type": "unanswerable", "note": "Not in the corpus. The system must refuse."}
+{"id": "u02", "question": "Who won the 2022 FIFA World Cup final?", "gold_sources": [], "answer_keywords": [], "type": "unanswerable"}
+{"id": "u03", "question": "What is the recommended dosage of amoxicillin for a child?", "gold_sources": [], "answer_keywords": [], "type": "unanswerable"}
+{"id": "u04", "question": "How do I configure nginx as a reverse proxy?", "gold_sources": [], "answer_keywords": [], "type": "unanswerable"}
+{"id": "u05", "question": "What are the tax implications of an S-corp election?", "gold_sources": [], "answer_keywords": [], "type": "unanswerable"}
