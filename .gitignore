@@ -30,3 +30,6 @@ Thumbs.db
 
 # Delivery archive (safe to delete)
 *.tar.gz
+
+# API key file
+keygroq.txt
